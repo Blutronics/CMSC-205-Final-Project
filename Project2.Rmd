@@ -72,7 +72,7 @@ one or two paragraph discussion of second figure
 ```{r}
 #Third figure (table or graph)
 ggplot(data = TuitionData2) +
-  geom_bar(mapping = aes(x =STABBR , y = earnings, fill = STABBR), stat = "identity",show.legend = FALSE) +
+  geom_bar(mapping = aes(x =STABBR , y = earnings), stat = "identity",show.legend = FALSE) +
   facet_wrap(~ year) +
   coord_cartesian(ylim=c(25000,48000)) +
   theme_bw() +
@@ -101,7 +101,7 @@ GenderData <- Project2 %>%
   group_by(gender) %>%
   summarize(medianEarnings = median(earnings,na.rm = TRUE))
 ggplot(data = GenderData) +
-  geom_bar(mapping = aes(x = gender, y = medianEarnings, fill = gender), stat = "identity")
+  geom_bar(mapping = aes(x = gender, y = medianEarnings), stat = "identity")
 options(warn = defaultW)
 ```
 
