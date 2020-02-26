@@ -1,0 +1,123 @@
+---
+title: "Change the title to one of your choice"
+author: "Toan Pham"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE, fig.height = 4, fig.width = 6 )
+```
+
+
+```{r}
+library(tidyverse)
+library(magrittr) # needs to be run every time you start R and want to use %>%
+library(dplyr) 
+library(rlist)
+```
+
+
+```{r, CACHE = TRUE}
+# read in data 
+Colleges1 <- read.csv("https://ed-public-download.app.cloud.gov/downloads/Most-Recent-Cohorts-Scorecard-Elements.csv")
+Colleges2 <- read.csv("https://ed-public-download.app.cloud.gov/downloads/Most-Recent-Cohorts-Treasury-Elements.csv")
+Colleges3 <- read.csv("https://ed-public-download.app.cloud.gov/downloads/Most-Recent-Cohorts-All-Data-Elements.csv")
+# dimensions should be:
+# Colleges1 7112 by 190
+# Colleges2 7112 by 92
+# Colleges3 7112 by 1978
+#check that this is the case
+```
+
+Type introductory paragraph. 
+ 
+
+```{r}
+#First figure (table or graph)
+defaultW <- getOption("warn") 
+
+options(warn = -1) 
+```
+
+
+one or two paragraph discussion of first figure
+
+
+```{r}
+#Second figure (figure or graph)
+Project2 <- Colleges3 %>% 
+  select(STABBR,INSTNM,SAT_AVG, contains("PCIP"),contains("DEBT"),MN_EARN_WNE_P10,MD_EARN_WNE_P10,  contains("MN_WNE_INC"),COUNT_WNE_P6,MD_EARN_WNE_P6,TUITIONFEE_IN,MN_EARN_WNE_MALE0_P10,MN_EARN_WNE_MALE1_P10,MN_EARN_WNE_MALE0_P6,MN_EARN_WNE_MALE1_P6)
+TuitionData2 <- Project2 %>% 
+  select(STABBR,TUITIONFEE_IN,MD_EARN_WNE_P6,MD_EARN_WNE_P10) %>%
+  mutate_at(c("TUITIONFEE_IN","MD_EARN_WNE_P6","MD_EARN_WNE_P10") , as.character) %>%
+  mutate_at(c("TUITIONFEE_IN","MD_EARN_WNE_P6","MD_EARN_WNE_P10") , as.numeric) %>%
+  group_by(STABBR) %>%
+  summarize(medianFee = median(TUITIONFEE_IN,na.rm = TRUE),
+            medianEarnafter6 = median(MD_EARN_WNE_P6, na.rm = TRUE),
+            medianEarnafter10 = median(MD_EARN_WNE_P10, na.rm = TRUE)) %>%
+  pivot_longer(cols = c(medianEarnafter6,medianEarnafter10), 
+                                      names_to = "year", values_to="earnings") %>%
+  filter(STABBR %in% c("CT","DC","IA", "MA","NE","NH","PA","RI","TN","VT"))
+TuitionData2
+
+
+```
+
+one or two paragraph discussion of second figure
+
+
+```{r}
+#Third figure (table or graph)
+ggplot(data = TuitionData2) +
+  geom_bar(mapping = aes(x =STABBR , y = earnings, fill = STABBR), stat = "identity",show.legend = FALSE) +
+  facet_wrap(~ year) +
+  coord_cartesian(ylim=c(25000,48000)) +
+  theme_bw() +
+  ylab("Average earnings after X years") +
+  xlab("States") +
+  labs(title = "Top 10 states with highest earnings after 6 and 10 years")
+  
+```
+
+one or two paragraph discussion of third figure
+
+
+
+```{r}
+#Fourth figure (table or graph) - optional
+GenderData <- Project2 %>% 
+  select(MN_EARN_WNE_MALE0_P10,MN_EARN_WNE_MALE1_P10) %>%
+  mutate_at(c("MN_EARN_WNE_MALE0_P10","MN_EARN_WNE_MALE1_P10") , as.character) %>%
+  mutate_at(c("MN_EARN_WNE_MALE0_P10","MN_EARN_WNE_MALE1_P10") , as.numeric) %>%
+  rename(
+    female = MN_EARN_WNE_MALE0_P10,
+    male = MN_EARN_WNE_MALE1_P10
+    ) %>%
+  pivot_longer(cols = c(female,male), 
+                                      names_to = "gender", values_to="earnings") %>%
+  group_by(gender) %>%
+  summarize(medianEarnings = median(earnings,na.rm = TRUE))
+ggplot(data = GenderData) +
+  geom_bar(mapping = aes(x = gender, y = medianEarnings, fill = gender), stat = "identity")
+options(warn = defaultW)
+```
+
+one or two paragraph discussion of fourth figure
+
+
+
+```{r}
+#Fifth figure (table or graph) - optional
+```
+
+one or two paragraph discussion of fifth figure
+
+
+## Appendix 
+
+```{r}
+#Additional figure(s) if desired
+```
