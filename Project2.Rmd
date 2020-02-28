@@ -37,9 +37,18 @@ Type introductory paragraph.
 
 ```{r}
 #First figure (table or graph)
-defaultW <- getOption("warn") 
-
-options(warn = -1) 
+Project2 <- Colleges3 %>% 
+  select(STABBR,INSTNM,SAT_AVG, contains("PCIP"),contains("DEBT"),MN_EARN_WNE_P10,MD_EARN_WNE_P10,  contains("MN_WNE_INC"),COUNT_WNE_P6,MD_EARN_WNE_P6,TUITIONFEE_IN,MN_EARN_WNE_MALE0_P10,MN_EARN_WNE_MALE1_P10,MN_EARN_WNE_MALE0_P6,MN_EARN_WNE_MALE1_P6)
+TuitionData1 <- Project2 %>% 
+  select(STABBR,TUITIONFEE_IN,MD_EARN_WNE_P6) %>%
+  mutate_at(c("TUITIONFEE_IN","MD_EARN_WNE_P6") , as.character) %>%
+  mutate_at(c("TUITIONFEE_IN","MD_EARN_WNE_P6") , as.numeric)
+ggplot(data = TuitionData1) +
+  geom_point(mapping = aes(x = log2(TUITIONFEE_IN), y = log2(MD_EARN_WNE_P6)),shape = 21,color = "black", size = 1, stroke = 1, fill = "white") +
+  geom_smooth(mapping = aes(x = log2(TUITIONFEE_IN), y = log2(MD_EARN_WNE_P6)), size = 2, color = "blue") +
+  theme_bw() +
+  xlab("Tuition fee") +
+  ylab("Earnings after 6 years")
 ```
 
 
@@ -48,8 +57,6 @@ one or two paragraph discussion of first figure
 
 ```{r}
 #Second figure (figure or graph)
-Project2 <- Colleges3 %>% 
-  select(STABBR,INSTNM,SAT_AVG, contains("PCIP"),contains("DEBT"),MN_EARN_WNE_P10,MD_EARN_WNE_P10,  contains("MN_WNE_INC"),COUNT_WNE_P6,MD_EARN_WNE_P6,TUITIONFEE_IN,MN_EARN_WNE_MALE0_P10,MN_EARN_WNE_MALE1_P10,MN_EARN_WNE_MALE0_P6,MN_EARN_WNE_MALE1_P6)
 TuitionData2 <- Project2 %>% 
   select(STABBR,TUITIONFEE_IN,MD_EARN_WNE_P6,MD_EARN_WNE_P10) %>%
   mutate_at(c("TUITIONFEE_IN","MD_EARN_WNE_P6","MD_EARN_WNE_P10") , as.character) %>%
@@ -61,16 +68,6 @@ TuitionData2 <- Project2 %>%
   pivot_longer(cols = c(medianEarnafter6,medianEarnafter10), 
                                       names_to = "year", values_to="earnings") %>%
   filter(STABBR %in% c("CT","DC","IA", "MA","NE","NH","PA","RI","TN","VT"))
-TuitionData2
-
-
-```
-
-one or two paragraph discussion of second figure
-
-
-```{r}
-#Third figure (table or graph)
 ggplot(data = TuitionData2) +
   geom_bar(mapping = aes(x =STABBR , y = earnings), stat = "identity",show.legend = FALSE) +
   facet_wrap(~ year) +
@@ -79,15 +76,14 @@ ggplot(data = TuitionData2) +
   ylab("Average earnings after X years") +
   xlab("States") +
   labs(title = "Top 10 states with highest earnings after 6 and 10 years")
-  
+
 ```
 
-one or two paragraph discussion of third figure
-
+one or two paragraph discussion of second figure
 
 
 ```{r}
-#Fourth figure (table or graph) - optional
+#Third figure (table or graph)
 GenderData <- Project2 %>% 
   select(MN_EARN_WNE_MALE0_P10,MN_EARN_WNE_MALE1_P10) %>%
   mutate_at(c("MN_EARN_WNE_MALE0_P10","MN_EARN_WNE_MALE1_P10") , as.character) %>%
@@ -101,8 +97,22 @@ GenderData <- Project2 %>%
   group_by(gender) %>%
   summarize(medianEarnings = median(earnings,na.rm = TRUE))
 ggplot(data = GenderData) +
-  geom_bar(mapping = aes(x = gender, y = medianEarnings), stat = "identity")
-options(warn = defaultW)
+  geom_bar(mapping = aes(x = gender, y = medianEarnings), stat = "identity") + 
+  theme_bw() +
+  ylab("Median Earnings after 10 years") +
+  xlab("Gender");
+  
+```
+
+one or two paragraph discussion of third figure
+
+
+
+```{r}
+#Fourth figure (table or graph) - optional
+DebtData <- Project2 %>% 
+  select(GRAD_DEBT_MDN,MD_EARN_WNE_P10,LO_INC_DEBT_MDN,MD_INC_DEBT_MDN,HI_INC_DEBT_MDN)
+
 ```
 
 one or two paragraph discussion of fourth figure
