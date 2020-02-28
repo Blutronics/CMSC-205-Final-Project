@@ -111,7 +111,16 @@ one or two paragraph discussion of third figure
 ```{r}
 #Fourth figure (table or graph) - optional
 DebtData <- Project2 %>% 
-  select(GRAD_DEBT_MDN,MD_EARN_WNE_P10,LO_INC_DEBT_MDN,MD_INC_DEBT_MDN,HI_INC_DEBT_MDN)
+  select(GRAD_DEBT_MDN,MD_EARN_WNE_P10,LO_INC_DEBT_MDN,MD_INC_DEBT_MDN,HI_INC_DEBT_MDN) %>%
+  mutate_at(c("GRAD_DEBT_MDN","MD_EARN_WNE_P10","LO_INC_DEBT_MDN","MD_INC_DEBT_MDN","HI_INC_DEBT_MDN") , as.character) %>%
+  mutate_at(c("GRAD_DEBT_MDN","MD_EARN_WNE_P10","LO_INC_DEBT_MDN","MD_INC_DEBT_MDN","HI_INC_DEBT_MDN") , as.numeric) %>%
+  rename(
+    Low_Income = LO_INC_DEBT_MDN,
+    Middle_Income = MD_INC_DEBT_MDN,
+    High_Income = HI_INC_DEBT_MDN
+    ) %>%
+  pivot_longer(cols = c(Low_Income,Middle_Income,High_Income), 
+                                      names_to = "Income_Level", values_to="Median Debt")
 
 ```
 
