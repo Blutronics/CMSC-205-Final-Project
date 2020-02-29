@@ -34,9 +34,9 @@ Colleges3 <- read.csv("https://ed-public-download.app.cloud.gov/downloads/Most-R
 
 Type introductory paragraph. 
  
-
+                                       
 ```{r}
-#First figure (table or graph)
+#First figure (table or graph)      
 Project2 <- Colleges3 %>% 
   select(STABBR,INSTNM,SAT_AVG, contains("PCIP"),contains("DEBT"),MN_EARN_WNE_P10,MD_EARN_WNE_P10,  contains("MN_WNE_INC"),COUNT_WNE_P6,MD_EARN_WNE_P6,TUITIONFEE_IN,MN_EARN_WNE_MALE0_P10,MN_EARN_WNE_MALE1_P10,MN_EARN_WNE_MALE0_P6,MN_EARN_WNE_MALE1_P6)
 TuitionData1 <- Project2 %>% 
@@ -101,12 +101,8 @@ GenderData <- Project2 %>%
   pivot_longer(cols = c(female,male), 
                                       names_to = "gender", values_to="earnings") %>%
   group_by(gender) %>%
-  summarize(medianEarnings = median(earnings,na.rm = TRUE))
-ggplot(data = GenderData) +
-  geom_bar(mapping = aes(x = gender, y = medianEarnings), stat = "identity") + 
-  theme_bw() +
-  ylab("Median Earnings after 10 years") +
-  xlab("Gender");
+  summarize(medianEarnings = median(earnings,na.rm = TRUE)); GenderData
+
   
 ```
 
@@ -131,24 +127,43 @@ DebtData <- Project2 %>%
 ggplot(data = DebtData) +
   geom_point(mapping = aes(x = log2(Median_Debt), y = MD_EARN_WNE_P6, fill = Income_Level),shape = 21,color = "black", size = 1, stroke = 1) +
   geom_smooth(mapping = aes(x = log2(Median_Debt), y = MD_EARN_WNE_P6,color = Income_Level), size = 1) +
-  theme_bw()
+  theme_bw() + xlab("log of Median debt") + ylab("median earning after 6 years")
   
 
 ```
 
 one or two paragraph discussion of fourth figure
                      
-
+In generally, it is worth to have higher debt if the students can get into more prestige schools. These schools can help students to make more connections and get more job opportunities. However, there is a cut in which it is no longer true. The cut happens when log of median debt equals 13 and when log debt is larger than 15. This can be explained that when the debt is too much, it is hard to focus on schools thus 
 
 
 
 ```{r}
 #Fifth figure (table or graph) - optional
+Colleges_SAT <- Colleges1 %>% select(INSTNM, STABBR, SAT_AVG)
 
+
+Colleges_SAT$SAT_AVG <- as.character(Colleges_SAT$SAT_AVG)
+Colleges_SAT$SAT_AVG <- as.numeric(Colleges_SAT$SAT_AVG)
+
+Colleges_money <- Colleges3 %>% select(INSTNM, MD_EARN_WNE_P6, DEBT_MDN_SUPP)
+
+Colleges_SAT_complete <- full_join(Colleges_SAT,Colleges_money)
+
+Colleges_SAT_complete$MD_EARN_WNE_P6 <- as.character(Colleges_SAT_complete$MD_EARN_WNE_P6)
+
+Colleges_SAT_complete$MD_EARN_WNE_P6 <- as.numeric(Colleges_SAT_complete$MD_EARN_WNE_P6)
+
+highest_sat <- Colleges_SAT_complete %>% group_by(STABBR) %>% summarize(mean_sat = mean(SAT_AVG, na.rm = TRUE)) %>% arrange(desc(mean_sat))
+
+head(Colleges_SAT_complete)
+#According to highest_sat, top 10 states with highest SAT average are DC, RI, NH, UT, MA, WY, CA, MN, NY, WA
+
+ggplot(Colleges_SAT_complete, aes(x = SAT_AVG,y = MD_EARN_WNE_P6, stroke = 1, alpha = 0.1)) + geom_point() + xlab("SAT average") + ylab("Median earnings of students working") + theme_bw() + geom_smooth(method = "lm") + theme(legend.position = "none")
 ```
 
 one or two paragraph discussion of fifth figure
-
+The graph above shows the correlation between SAT average and median earnings of students working 6 years after graduation. The linear model establishes a positive trend, indicating that with higher SAT score, students tend to make more money after graduation. This makes sense as with high SAT score, students have more chance to get into better schools thus make more connections and be more prepared when it comes to getting jobs. However, there are a few outliers. There are students who make above $60.000 with a 1100 SAT average. Numerous factors could be responsible for this: some students may do bad in one test but excel at college, some students may have talents in different fields and utilize it, some might have a wealthy family, etc. All in all, those are just a small number of outliers and will not change the fact that SAT score plays a role in students' financial success.
 
 ## Appendix 
 
