@@ -44,8 +44,8 @@ TuitionData1 <- Project2 %>%
   mutate_at(c("TUITIONFEE_IN","MD_EARN_WNE_P6") , as.character) %>%
   mutate_at(c("TUITIONFEE_IN","MD_EARN_WNE_P6") , as.numeric)
 ggplot(data = TuitionData1) +
-  geom_point(mapping = aes(x = log2(TUITIONFEE_IN), y = log2(MD_EARN_WNE_P6)),shape = 21,color = "black", size = 1, stroke = 1, fill = "white") +
-  geom_smooth(mapping = aes(x = log2(TUITIONFEE_IN), y = log2(MD_EARN_WNE_P6)), size = 2, color = "blue") +
+  geom_point(mapping = aes(x = log2(TUITIONFEE_IN), y = MD_EARN_WNE_P6),shape = 21,color = "black", size = 1, stroke = 1, fill = "white") +
+  geom_smooth(mapping = aes(x = log2(TUITIONFEE_IN), y = MD_EARN_WNE_P6), size = 2, color = "blue") +
   theme_bw() +
   xlab("Tuition fee") +
   ylab("Earnings after 6 years")
@@ -53,6 +53,9 @@ ggplot(data = TuitionData1) +
 
 
 one or two paragraph discussion of first figure
+There is a clear trend here: as tuition fee increases, earnings after 6 years also increases. This mean that tuition fee directly correlate with earnings after 6 years.
+As we observe more closely, we can also see that the rate at which the earnings increase is not constant. To be more specific, while it starts off slowly, the slope get higher and  higher as tuition fee increase. This means that below a certain tuition fee cap, the change in earnings does not really matter. However, at more prestigious universities, the difference in earnings is more notable.
+For anyone interested,before I used log2 to make the graph clearer, I did calculate the tuition fee breakpoint, the breakpoint is at around $10000/years.
 
 
 ```{r}
@@ -70,6 +73,7 @@ TuitionData2 <- Project2 %>%
   filter(STABBR %in% c("CT","DC","IA", "MA","NE","NH","PA","RI","TN","VT"))
 ggplot(data = TuitionData2) +
   geom_bar(mapping = aes(x =STABBR , y = earnings), stat = "identity",show.legend = FALSE) +
+  geom_hline((aes(yintercept = mean(earnings))), color = "red", size = 1) +
   facet_wrap(~ year) +
   coord_cartesian(ylim=c(25000,48000)) +
   theme_bw() +
@@ -80,14 +84,16 @@ ggplot(data = TuitionData2) +
 ```
 
 one or two paragraph discussion of second figure
+Right from the start, we can clearly see the difference between earnings after 6 years and 10 years. The state with the biggest growth is DC and the one with the slowest growth seems to be Tennessee. Overall, the average earnings is around $34000.
+In conclusion, for students who want to make good money right away, Massachusettss is a great place to start. For students who prefer better results in the long run, Washington DC is the best choice. In general, these are the 10 states with highest earnings so they all are solid choices.
 
 
 ```{r}
 #Third figure (table or graph)
 GenderData <- Project2 %>% 
-  select(MN_EARN_WNE_MALE0_P10,MN_EARN_WNE_MALE1_P10) %>%
-  mutate_at(c("MN_EARN_WNE_MALE0_P10","MN_EARN_WNE_MALE1_P10") , as.character) %>%
-  mutate_at(c("MN_EARN_WNE_MALE0_P10","MN_EARN_WNE_MALE1_P10") , as.numeric) %>%
+  select(MN_EARN_WNE_MALE0_P10,MN_EARN_WNE_MALE1_P10,MN_EARN_WNE_MALE0_P6,MN_EARN_WNE_MALE1_P6) %>%
+  mutate_at(c("MN_EARN_WNE_MALE0_P10","MN_EARN_WNE_MALE1_P10","MN_EARN_WNE_MALE0_P6","MN_EARN_WNE_MALE1_P6") , as.character) %>%
+  mutate_at(c("MN_EARN_WNE_MALE0_P10","MN_EARN_WNE_MALE1_P10","MN_EARN_WNE_MALE0_P6","MN_EARN_WNE_MALE1_P6") , as.numeric) %>%
   rename(
     female = MN_EARN_WNE_MALE0_P10,
     male = MN_EARN_WNE_MALE1_P10
@@ -105,31 +111,40 @@ ggplot(data = GenderData) +
 ```
 
 one or two paragraph discussion of third figure
+Not much to say here, male will earns more than female in the long run. The difference in median is around $10000
 
 
 
 ```{r}
 #Fourth figure (table or graph) - optional
 DebtData <- Project2 %>% 
-  select(GRAD_DEBT_MDN,MD_EARN_WNE_P10,LO_INC_DEBT_MDN,MD_INC_DEBT_MDN,HI_INC_DEBT_MDN) %>%
-  mutate_at(c("GRAD_DEBT_MDN","MD_EARN_WNE_P10","LO_INC_DEBT_MDN","MD_INC_DEBT_MDN","HI_INC_DEBT_MDN") , as.character) %>%
-  mutate_at(c("GRAD_DEBT_MDN","MD_EARN_WNE_P10","LO_INC_DEBT_MDN","MD_INC_DEBT_MDN","HI_INC_DEBT_MDN") , as.numeric) %>%
+  select(GRAD_DEBT_MDN,MD_EARN_WNE_P6,LO_INC_DEBT_MDN,MD_INC_DEBT_MDN,HI_INC_DEBT_MDN) %>%
+  mutate_at(c("GRAD_DEBT_MDN","MD_EARN_WNE_P6","LO_INC_DEBT_MDN","MD_INC_DEBT_MDN","HI_INC_DEBT_MDN") , as.character) %>%
+  mutate_at(c("GRAD_DEBT_MDN","MD_EARN_WNE_P6","LO_INC_DEBT_MDN","MD_INC_DEBT_MDN","HI_INC_DEBT_MDN") , as.numeric) %>%
   rename(
     Low_Income = LO_INC_DEBT_MDN,
     Middle_Income = MD_INC_DEBT_MDN,
     High_Income = HI_INC_DEBT_MDN
     ) %>%
   pivot_longer(cols = c(Low_Income,Middle_Income,High_Income), 
-                                      names_to = "Income_Level", values_to="Median Debt")
+                                      names_to = "Income_Level", values_to="Median_Debt")
+ggplot(data = DebtData) +
+  geom_point(mapping = aes(x = log2(Median_Debt), y = MD_EARN_WNE_P6, fill = Income_Level),shape = 21,color = "black", size = 1, stroke = 1) +
+  geom_smooth(mapping = aes(x = log2(Median_Debt), y = MD_EARN_WNE_P6,color = Income_Level), size = 1) +
+  theme_bw()
+  
 
 ```
 
 one or two paragraph discussion of fourth figure
+                     
+
 
 
 
 ```{r}
 #Fifth figure (table or graph) - optional
+
 ```
 
 one or two paragraph discussion of fifth figure
